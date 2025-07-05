@@ -57,8 +57,8 @@
                             <td>{{ $pesanan->id }}</td>
                             <td>{{ $pesanan->nama }}</td>
                             <td>{{ $pesanan->alamat }}</td>
-                            <td>{{ $pesanan->nomor_telepon }}</td>
-                            <td>{{ $pesanan->merek_motor }}</td>
+                            <td>{{ $pesanan->telepon }}</td>
+                            <td>{{ $pesanan->merk_motor }}</td>
                             <td>{{ $pesanan->tipe }}</td>
                             <td>{{ $pesanan->jumlah }}</td>
                             <td>{{ $pesanan->tanggal_terima }}</td>

@@ -15,35 +15,50 @@
             </div>
         @endif
 
-    <form action="{{ route('motor.store') }}" method="POST" class="form-motor">
-        @csrf
-        <div class="form-group">
-            <label for="merek">Merk Motor</label>
-            <input type="text" id="merek" name="merek" required>
-        </div>
+        <form action="{{ route('motor.store') }}" method="POST" class="form-motor">
+            @csrf
+            <div class="form-group">
+                <label for="id_motor">ID Motor</label>
+                <input type="text" id="id_motor" name="id_motor" required>
+            </div>
 
-        <div class="form-group">
-            <label for="harga">Harga</label>
-            <input type="text" id="harga" name="harga" required>
-        </div>
+            <div class="form-group">
+                <label for="merek">Merk Motor</label>
+                <input type="text" id="merek" name="merek" required>
+            </div>
 
-        <div class="form-group">
-            <label for="tipe">Tipe</label>
-            <input type="text" id="tipe" name="tipe" required>
-        </div>
+            <div class="form-group">
+                <label for="tipe">Tipe</label>
+                <input type="text" id="tipe" name="tipe" required>
+            </div>
 
-        <div class="form-group">
-            <label for="jumlah">Jumlah</label>
-            <input type="text" id="jumlah" name="jumlah" required>
-        </div>
+            <div class="form-group">
+                <label for="tahun">Tahun</label>
+                <input type="text" id="tahun" name="tahun" required>
+            </div>
 
-        <div class="form-group">
-            <label for="tahun_keluar">Tahun Keluar</label>
-            <input type="text" id="tahun_keluar" name="tahun_keluar" required>
-        </div>
+            <div class="form-group">
+                <label for="kilometer">Kilometer</label>
+                <input type="text" id="kilometer" name="kilometer" required>
+            </div>
 
-        <button type="submit">Input</button>
-    </form>
+            <div class="form-group">
+                <label for="jumlah">Jumlah</label>
+                <input type="text" id="jumlah" name="jumlah" required>
+            </div>
+
+            <div class="form-group">
+                <label for="harga">Harga</label>
+                <input type="text" id="harga" name="harga" required>
+            </div>
+
+            <div class="form-group">
+                <label for="status">Status</label>
+                <input type="text" id="status" name="status" required>
+            </div>
+
+            <button type="submit">Input</button>
+        </form>
     </div>
 
     <style>
@@ -81,7 +96,7 @@
             margin-bottom: 5px;
         }
 
-        input {
+        input, select {
             padding: 10px;
             font-size: 14px;
             border: 1px solid #ccc;

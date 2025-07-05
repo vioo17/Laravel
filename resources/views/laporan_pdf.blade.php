@@ -34,60 +34,85 @@
     <h2>Laporan Motor</h2>
 
     {{-- MOTOR MASUK --}}
-    <h3>Motor Masuk</h3>
+    <h3>Motor Masuk (Stok Saat Ini)</h3>
     <table>
         <thead>
             <tr>
-                <th>ID</th>
+                <th>ID Motor</th>
                 <th>Merek</th>
                 <th>Tipe</th>
-                <th>Tahun Keluar</th>
+                <th>Tahun</th>
+                <th>Kilometer</th>
                 <th>Harga</th>
+                <th>Jumlah (Stok)</th>
+                <th>Status</th>
             </tr>
         </thead>
         <tbody>
-            @forelse ($motorMasuk as $motor)
+            @php
+                $motorUnik = $motorMasuk->unique('id_motor');
+            @endphp
+            @forelse ($motorUnik as $motor)
+                @php
+                    $jumlahMasuk = $motorMasuk->where('id_motor', $motor->id_motor)->sum('jumlah');
+                    $jumlahKeluar = $motorKeluar->where('id_motor', $motor->id_motor)->sum('jumlah');
+                    $jumlahSisa = $jumlahMasuk - $jumlahKeluar;
+                @endphp
                 <tr>
-                    <td>{{ $motor->id }}</td>
+                    <td>{{ $motor->id_motor }}</td>
                     <td>{{ $motor->merek }}</td>
                     <td>{{ $motor->tipe }}</td>
-                    <td>{{ $motor->tahun_keluar }}</td>
+                    <td>{{ $motor->tahun }}</td>
+                    <td>{{ $motor->kilometer }}</td>
                     <td>Rp {{ number_format($motor->harga, 0, ',', '.') }}</td>
+                    <td>{{ $jumlahSisa >= 0 ? $jumlahSisa : 0 }}</td>
+                    <td>{{ $motor->status }}</td>
                 </tr>
             @empty
                 <tr>
-                    <td colspan="5">Data motor masuk kosong</td>
+                    <td colspan="8">Data motor masuk kosong</td>
                 </tr>
             @endforelse
         </tbody>
     </table>
 
-    {{-- MOTOR KELUAR --}}
+   {{-- MOTOR KELUAR --}}
     <h3>Motor Keluar</h3>
     <table>
         <thead>
             <tr>
-                <th>ID</th>
-                <th>Nama</th>
-                <th>Alamat</th>
-                <th>Telepon</th>
-                <th>Merk</th>
+                <th>ID Motor</th>
+                <th>Merek</th>
                 <th>Tipe</th>
-                <th>Jumlah</th>
-                <th>Tanggal Terima</th>
+                <th>Tahun</th>
+                <th>Kilometer</th>
+                <th>Harga</th>
+                <th>Jumlah Keluar</th>
+                <th>Tanggal Keluar</th>
             </tr>
         </thead>
         <tbody>
-            @forelse ($motorKeluar as $pesanan)
+            @php
+                $kelompokKeluar = $motorKeluar->groupBy('id_motor');
+            @endphp
+
+            @forelse ($kelompokKeluar as $id_motor => $pesananGroup)
+                @php
+                    $motor = $motorMasuk->firstWhere('id_motor', $id_motor);
+                    $totalKeluar = $pesananGroup->sum('jumlah');
+                    $tanggalTerakhir = $pesananGroup->max('tanggal_terima');
+                @endphp
                 <tr>
-                    <td>{{ $pesanan->id }}</td>
-                    <td>{{ $pesanan->nama }}</td>
-                    <td>{{ $pesanan->alamat }}</td>
-                    <td>{{ $pesanan->telepon }}</td>
-                    <td>{{ $pesanan->merk_motor }}</td>
-                    <td>{{ $pesanan->tipe }}</td>
-                    <td>{{ $pesanan->jumlah }}</td>
-                    <td>{{ \Carbon\Carbon::parse($pesanan->tanggal_terima)->format('d-m-Y') }}</td>
+                    <td>{{ $id_motor }}</td>
+                    <td>{{ $motor ? $motor->merek : '-' }}</td>
+                    <td>{{ $motor ? $motor->tipe : '-' }}</td>
+                    <td>{{ $motor ? $motor->tahun : '-' }}</td>
+                    <td>{{ $motor ? $motor->kilometer : '-' }}</td>
+                    <td>
+                        {{ $motor ? 'Rp ' . number_format($motor->harga, 0, ',', '.') : '-' }}
+                    </td>
+                    <td>{{ $totalKeluar }}</td>
+                    <td>{{ \Carbon\Carbon::parse($tanggalTerakhir)->format('d-m-Y') }}</td>
                 </tr>
             @empty
                 <tr>
@@ -96,6 +121,7 @@
             @endforelse
         </tbody>
     </table>
+
 
 </body>
 </html>

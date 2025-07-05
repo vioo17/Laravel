@@ -13,21 +13,34 @@ class MotorController extends Controller
             return redirect('/')->with('message', 'Silakan login terlebih dahulu.');
         }
 
-        return view('dashboard'); // tampilkan form tambah motor
+        return view('dashboard'); // atau view form motor jika terpisah: view('motor.create')
     }
 
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'merek' => 'required|string|max:255',
-            'harga' => 'required|numeric',
-            'tipe' => 'required|string|max:255',
-            'jumlah' => 'required|integer',
-            'tahun_keluar' => 'required|integer|min:2005|max:' . date('Y'),
+            'id_motor' => 'required|string',
+            'merek' => 'required|string',
+            'tipe' => 'required|string',
+            'tahun' => 'required|integer',
+            'kilometer' => 'required|integer',
+            'jumlah' => 'required|integer|min:1',
+            'harga' => 'required|integer',
+            'status' => 'required|string',
         ]);
 
-        Motor::create($validated);
+        // Cek apakah id_motor sudah ada
+        $motor = Motor::where('id_motor', $validated['id_motor'])->first();
 
-        return redirect('/dashboard')->with('success', 'Data motor berhasil ditambahkan!');
+        if ($motor) {
+            // Update stok (jumlah)
+            $motor->jumlah += $validated['jumlah'];
+            $motor->save();
+        } else {
+            // Simpan motor baru
+            Motor::create($validated);
+        }
+
+        return redirect()->back()->with('success', 'Motor berhasil ditambahkan atau diperbarui.');
     }
 }

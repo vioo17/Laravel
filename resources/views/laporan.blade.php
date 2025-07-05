@@ -1,132 +1,156 @@
 @extends('layouts.app')
 
 @section('content')
-    <div class="laporan-wrapper">
-        <h2 class="judul-laporan">Laporan</h2>
+<div class="laporan-wrapper">
+    <h2 class="judul-laporan">Laporan</h2>
 
-        {{-- MOTOR MASUK --}}
-        <div class="section">
-            <h3>Motor Masuk</h3>
-            <table>
-                <thead>
+    {{-- MOTOR MASUK --}}
+    <div class="section">
+        <h3>Motor Masuk (Stok Saat Ini)</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Merek</th>
+                    <th>Tipe</th>
+                    <th>Tahun</th>
+                    <th>Kilometer</th>
+                    <th>Harga</th>
+                    <th>Jumlah (Stok)</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                @forelse($motorMasuk as $motor)
+                    @php
+                        $jumlahMasuk = $motorMasuk->where('id_motor', $motor->id_motor)->sum('jumlah');
+                        $jumlahKeluar = $motorKeluar->where('id_motor', $motor->id_motor)->sum('jumlah');
+                        $jumlahSisa = $jumlahMasuk - $jumlahKeluar;
+                    @endphp
                     <tr>
-                        <th>ID</th>
-                        <th>Merk</th>
-                        <th>Tipe</th>
-                        <th>Tahun Keluar</th>
-                        <th>Harga</th>
+                        
+                        <td>{{ $motor->id_motor }}</td>
+                        <td>{{ $motor->merek }}</td>
+                        <td>{{ $motor->tipe }}</td>
+                        <td>{{ $motor->tahun }}</td>
+                        <td>{{ $motor->kilometer }}</td>
+                        <td>Rp {{ number_format($motor->harga) }}</td>
+                        <td>{{ $jumlahSisa >= 0 ? $jumlahSisa : 0 }}</td>
+                        <td>{{ $motor->status }}</td>
                     </tr>
-                </thead>
-                <tbody>
-                    @forelse($motorMasuk as $motor)
-                        <tr>
-                            <td>{{ $motor->id }}</td>
-                            <td>{{ $motor->merek }}</td>
-                            <td>{{ $motor->tipe }}</td>
-                            <td>{{ $motor->tahun_keluar }}</td>
-                            <td>{{ $motor->harga }}</td>
-                        </tr>
-                    @empty
-                        <tr>
-                            <td colspan="5">Data Motor Masuk Kosong</td>
-                        </tr>
-                    @endforelse
-                </tbody>
-            </table>
-        </div>
-
-        {{-- MOTOR KELUAR (PESANAN) --}}
-        <div class="section">
-            <h3>Motor Keluar</h3>
-            <table>
-                <thead>
+                @empty
                     <tr>
-                        <th>ID</th>
-                        <th>Nama</th>
-                        <th>Alamat</th>
-                        <th>Telepon</th>
-                        <th>Merek</th>
-                        <th>Tipe</th>
-                        <th>Jumlah</th>
-                        <th>Tanggal Terima</th>
+                        <td colspan="8">Data Motor Masuk Kosong</td>
                     </tr>
-                </thead>
-                <tbody>
-                    @forelse($motorKeluar as $pesanan)
-                        <tr>
-                            <td>{{ $pesanan->id }}</td>
-                            <td>{{ $pesanan->nama }}</td>
-                            <td>{{ $pesanan->alamat }}</td>
-                            <td>{{ $pesanan->telepon }}</td>
-                            <td>{{ $pesanan->merk_motor }}</td>
-                            <td>{{ $pesanan->tipe }}</td>
-                            <td>{{ $pesanan->jumlah }}</td>
-                            <td>{{ $pesanan->tanggal_terima }}</td>
-                        </tr>
-                    @empty
-                        <tr>
-                            <td colspan="8">Data Motor Keluar Kosong</td>
-                        </tr>
-                    @endforelse
-                </tbody>
-            </table>
-        </div>
-
-        {{-- TOMBOL CETAK --}}
-        <div class="cetak-btn-wrapper">
-            <a href="{{ route('laporan.download') }}" class="btn-cetak">Cetak</a>
-        </div>
+                @endforelse
+            </tbody>
+        </table>
     </div>
 
-    {{-- STYLE --}}
-    <style>
-        .laporan-wrapper {
-            padding: 20px 40px;
-        }
+    {{-- MOTOR KELUAR --}}
+<div class="section">
+    <h3>Motor Keluar</h3>
+    <table>
+        <thead>
+            <tr>
+                <th>ID Motor</th>
+                <th>Merek</th>
+                <th>Tipe</th>
+                <th>Tahun</th>
+                <th>Kilometer</th>
+                <th>Harga</th>
+                <th>Jumlah Terjual</th>
+                <th>Tanggal Keluar Terakhir</th>
+            </tr>
+        </thead>
+        <tbody>
+            @php
+                $kelompokKeluar = $motorKeluar->groupBy('id_motor');
+            @endphp
 
-        .judul-laporan {
-            text-align: center;
-            font-size: 24px;
-            margin-bottom: 30px;
-        }
+            @forelse($kelompokKeluar as $id_motor => $pesananGroup)
+                @php
+                    $motor = $motorMasuk->firstWhere('id_motor', $id_motor);
+                    $totalKeluar = $pesananGroup->sum('jumlah');
+                    $tanggalTerakhir = $pesananGroup->max('tanggal_terima');
+                @endphp
 
-        .section {
-            margin-bottom: 40px;
-        }
+                @if($motor)
+                    <tr>
+                        <td>{{ $id_motor }}</td>
+                        <td>{{ $motor->merek }}</td>
+                        <td>{{ $motor->tipe }}</td>
+                        <td>{{ $motor->tahun }}</td>
+                        <td>{{ $motor->kilometer }}</td>
+                        <td>Rp {{ number_format($motor->harga) }}</td>
+                        <td>{{ $totalKeluar }}</td>
+                        <td>{{ \Carbon\Carbon::parse($tanggalTerakhir)->format('d-m-Y') }}</td>
+                    </tr>
+                @endif
+            @empty
+                <tr>
+                    <td colspan="8">Data Motor Keluar Kosong</td>
+                </tr>
+            @endforelse
+        </tbody>
+    </table>
+</div>
 
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            background-color: white;
-        }
+    {{-- TOMBOL CETAK --}}
+    <div class="cetak-btn-wrapper">
+        <a href="{{ route('laporan.download') }}" class="btn-cetak">Cetak</a>
+    </div>
+</div>
 
-        th, td {
-            border: 1px solid #aaa;
-            padding: 10px;
-            text-align: center;
-        }
+{{-- STYLE --}}
+<style>
+    .laporan-wrapper {
+        padding: 20px 40px;
+    }
 
-        th {
-            background-color: #f0f0f0;
-        }
+    .judul-laporan {
+        text-align: center;
+        font-size: 24px;
+        margin-bottom: 30px;
+    }
 
-        .cetak-btn-wrapper {
-            display: flex;
-            justify-content: flex-end;
-            padding-right: 20px;
-        }
+    .section {
+        margin-bottom: 40px;
+    }
 
-        .btn-cetak {
-            background-color: #6b8f71;
-            color: white;
-            padding: 10px 30px;
-            border-radius: 10px;
-            text-decoration: none;
-            font-weight: bold;
-        }
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        background-color: white;
+    }
 
-        .btn-cetak:hover {
-            background-color: #5e7e65;
-        }
-    </style>
+    th, td {
+        border: 1px solid #aaa;
+        padding: 10px;
+        text-align: center;
+    }
+
+    th {
+        background-color: #f0f0f0;
+    }
+
+    .cetak-btn-wrapper {
+        display: flex;
+        justify-content: flex-end;
+        padding-right: 20px;
+    }
+
+    .btn-cetak {
+        background-color: #6b8f71;
+        color: white;
+        padding: 10px 30px;
+        border-radius: 10px;
+        text-decoration: none;
+        font-weight: bold;
+    }
+
+    .btn-cetak:hover {
+        background-color: #5e7e65;
+    }
+</style>
 @endsection

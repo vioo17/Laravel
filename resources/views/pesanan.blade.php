@@ -39,7 +39,7 @@
         font-weight: 500;
     }
 
-    input {
+    input, select {
         padding: 8px 10px;
         border: 1px solid #ccc;
         border-radius: 4px;
@@ -58,13 +58,12 @@
         border-radius: 10px;
         cursor: pointer;
     }
-
 </style>
 
 <div class="form-wrapper">
     <h2 class="title">Buat Pesanan</h2>
 
-    {{-- Menampilkan pesan sukses jika ada --}}
+    {{-- Pesan sukses --}}
     @if(session('message'))
         <div class="success-message">{{ session('message') }}</div>
     @endif
@@ -72,44 +71,61 @@
     <form method="POST" action="{{ route('pesanan.store') }}">
         @csrf
 
-        <div class="form-group">
-            <label for="nama">Nama</label>
-            <input type="text" name="nama" id="nama" required>
+        {{-- Pilih Motor --}}
+        <div class="form-group full-width">
+            <label for="id_motor">Pilih Motor</label>
+            <select name="id_motor" id="id_motor" required onchange="tampilkanDetailMotor()">
+                <option value="">-- Pilih Motor --</option>
+                @foreach($motorMasuk as $motor)
+                    <option value="{{ $motor->id_motor }}">
+                        {{ $motor->id_motor }} - {{ $motor->merek }} {{ $motor->tipe }} ({{ $motor->tahun }})
+                    </option>
+                @endforeach
+            </select>
         </div>
 
-        <div class="form-group">
-            <label for="tipe">Tipe</label>
-            <input type="text" name="tipe" id="tipe" required>
-        </div>
-
+        {{-- Alamat --}}
         <div class="form-group">
             <label for="alamat">Alamat</label>
             <input type="text" name="alamat" id="alamat" required>
         </div>
 
-        <div class="form-group">
-            <label for="merk_motor">Merk Motor</label>
-            <input type="text" name="merk_motor" id="merk_motor" required>
-        </div>
-
-        <div class="form-group">
-            <label for="telepon">Nomor Telepon</label>
-            <input type="text" name="telepon" id="telepon" required>
-        </div>
-
+        {{-- Jumlah --}}
         <div class="form-group">
             <label for="jumlah">Jumlah</label>
-            <input type="number" name="jumlah" id="jumlah" required>
+            <input type="number" name="jumlah" id="jumlah" required min="1">
         </div>
 
+        {{-- Tanggal Terima --}}
         <div class="form-group full-width">
-            <label for="tanggal_terima">Tanggal Terima</label>
+            <label for="tanggal_terima">Tanggal Keluar</label>
             <input type="date" name="tanggal_terima" id="tanggal_terima" required>
         </div>
 
+        {{-- Tombol --}}
         <div class="form-group full-width">
             <button type="submit">Simpan</button>
         </div>
     </form>
 </div>
+
+
+<script>
+    const motorData = @json($motorMasuk->keyBy('id_motor'));
+
+    function tampilkanDetailMotor() {
+        const selectedId = document.getElementById('id_motor').value;
+        const motor = motorData[selectedId];
+        if (motor) {
+            alert(
+                `Detail Motor:\n` +
+                `Merek: ${motor.merek}\n` +
+                `Tipe: ${motor.tipe}\n` +
+                `Tahun: ${motor.tahun}\n` +
+                `Kilometer: ${motor.kilometer}\n` +
+                `Harga: Rp ${Number(motor.harga).toLocaleString()}`
+            );
+        }
+    }
+</script>
 @endsection

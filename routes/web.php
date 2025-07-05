@@ -20,5 +20,5 @@ Route::get('/laporan/download', [LaporanController::class, 'download'])->name('l
 
 Route::post('/pesanan', [PesananController::class, 'store'])->name('pesanan.store');
 Route::get('/pesanan', [PesananController::class, 'create'])->name('pesanan.create');
-
+Route::get('/pesanan', [PesananController::class, 'create'])->name('pesanan');
 

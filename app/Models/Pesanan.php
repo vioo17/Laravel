@@ -6,9 +6,14 @@ use Illuminate\Database\Eloquent\Model;
 
 class Pesanan extends Model
 {
-    protected $table = 'pesanans';
+     protected $table = 'pesanans';
 
     protected $fillable = [
-        'nama', 'alamat', 'telepon', 'tanggal_terima', 'tipe', 'merk_motor', 'jumlah'
+        'id_motor', 'alamat', 'tanggal_terima', 'jumlah'
     ];
+
+    public function motor()
+    {
+        return $this->belongsTo(Motor::class, 'id_motor', 'id_motor');
+    }
 }

@@ -12,13 +12,17 @@ return new class extends Migration
     public function up(): void
     {
        Schema::create('motors', function (Blueprint $table) {
-        $table->id();
-        $table->string('merek');
-        $table->integer('harga');
-        $table->string('tipe');
-        $table->integer('jumlah');
-        $table->integer('tahun_keluar');
-        $table->timestamps();
+            $table->id(); 
+            $table->string('id_motor')->unique();
+            $table->string('merek');
+            $table->string('tipe');
+            $table->integer('tahun');
+            $table->integer('kilometer');
+            $table->integer('jumlah');
+            $table->integer('harga');
+            $table->string('status'); 
+            $table->timestamps();
+            
     });
     }
 
